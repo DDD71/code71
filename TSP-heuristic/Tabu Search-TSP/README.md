@@ -36,6 +36,9 @@ sBest ← s0
 'R101.txt' is from solomon benchmark, more details can be found in [solomon-benchmark](https://www.sintef.no/projectweb/top/vrptw/solomon-benchmark/).
 
 
+## My blog
+See [my blog](https://blog.csdn.net/DCXY71/article/details/110727046?spm=1001.2014.3001.5501) for more detailed explanation
+
 
 ## Ref
  1. Fred Glover (1986). "Future Paths for Integer Programming and Links to Artificial Intelligence". Computers and Operations Research. 13 (5): 533–549. doi:10.1016/0305-0548(86)90048-1.  
