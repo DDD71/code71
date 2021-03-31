@@ -1,3 +1,9 @@
+'''
+Description: tabu search for TSP
+Version: 1.0 (original tabu search without any optimization)
+Author: 71
+Date: 2020-10-31 
+'''
 from itertools import combinations
 import os,sys,copy
 import numpy as np
@@ -102,15 +108,6 @@ if __name__ == "__main__":
     tsp_data = data.generate_locations(num_points=customerNum+1,map_size=100)  #在100*100的图中，随机生成位置，customerNum+1 多一个depot点
     dismatrix = data.get_euclidean_distance_matrix(tsp_data.locations)
     # data.plot_nodes(tsp_data.locations)
-    """ Tabu : 
-        disMatrix : the distance matrix from 0 to X , 0 represernt starting and stopping point。 
-        for example:   disMatrix = [[0,3,4,...
-        							 1,0,5,...
-        							 3,5,0,...]]
-       that means the distance from 0 to 0 is 0, from 0 to 1 is 3,... from 1 to 3 is 5....		
-        max_iters : maximum iterations 
-        maxTabuSize : maximum iterations 
-    """
     tsp = Tabu(disMatrix=dismatrix ,max_iters=20,maxTabuSize=10) 
 	# two different way to generate initial solution
 	# num : the number of points   
