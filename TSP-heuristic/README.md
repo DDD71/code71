@@ -1,6 +1,6 @@
 # meta-Heuristic
 
-the meta-Heuristic algorithm implementation with an example of TSP, including :
+the meta-Heuristic algorithm implementations with an example of TSP, including :
 - Tabu Search (TS)
 - Genetic Algorithm (GA)
 - Simulated Annealing (SA)
