@@ -7,4 +7,9 @@ the meta-Heuristic algorithm implementation with an example of TSP, including :
 - Large Scale Neighborhood Search (LSNS)
 - 
 
-certainly，It can be applied not only in TSP, but also in many problems which depends on your need.
+Certainly，It can be applied not only in TSP, but also in many problems which depends on your need.
+
+
+## Numerical example
+
+'R101.txt' is from solomon benchmark, more details can be found in https://www.sintef.no/projectweb/top/vrptw/solomon-benchmark/
