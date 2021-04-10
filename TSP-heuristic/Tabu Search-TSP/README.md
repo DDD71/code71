@@ -1,5 +1,5 @@
 # Tabu Search
-the basic tabu search implementaion with pyhton using TSP as an example.
+the basic tabu search implementaion of pyhton using TSP as an example.
 
 
 Tabu search is a metaheuristic search method employing local search methods used for mathematical optimization. It was created by Fred W. Glover in 1986[1] and formalized in 1989.

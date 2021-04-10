@@ -1,5 +1,5 @@
 # Genetic Algorithm
-the basic Genetic Algorithm implementaion with pyhton using TSP as an example.
+The basic Genetic Algorithm implementaion of pyhton using TSP as an example.
 
 
 ## GA flow chart
