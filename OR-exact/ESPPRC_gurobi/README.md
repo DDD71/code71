@@ -5,7 +5,8 @@ ESPPRC(Elementary Shortest Path Problem with Resource Constraints) often appears
 ## model
 
 The ESPPRC can be described with the following model:
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210410145630594.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0RDWFk3MQ==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210410152250353.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0RDWFk3MQ==,size_16,color_FFFFFF,t_70)
+
 
 
 ## Numerical example
