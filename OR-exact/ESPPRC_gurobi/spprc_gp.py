@@ -6,13 +6,12 @@ Date: 2021-04-01 11:48:47
 '''
 
 import numpy as np
-import random,copy
 from gurobipy import *
 from GetData import *
 
 
 def spprc_gp(nodes):
-    BigM = 1e8
+    BigM = 1e10
     model = Model('SPPRC')
     #定义决策变量
     x = {}
@@ -53,7 +52,7 @@ def spprc_gp(nodes):
 
     # s.t 3
     lhs = LinExpr(0)
-    for i in range(0,nodes.nodeNum-1):
+    for i in range(1,nodes.nodeNum-1):
         lhs.addTerms(1, x[i,nodes.nodeNum-1])
     model.addConstr(lhs == 1, name= 'arrive_' + str(i))
 
@@ -61,14 +60,14 @@ def spprc_gp(nodes):
     for i in range(nodes.nodeNum):
         for j in range(nodes.nodeNum):
             if (i != j):
-                model.addConstr(nodes.timewindows[i] + nodes.disMatrix[i][j] - nodes.timewindows[j] <= BigM*(1-x[i,j]), name = 'time_window' + str(i) + str(j))
+                model.addConstr(nodes.dueTime[i] + nodes.disMatrix[i][j] - nodes.dueTime[j] <= BigM*(1-x[i,j]), name = 'time_window_' + str(i) + str(j))
 
     # s.t 5
     lhs = LinExpr(0)
     for i in range(nodes.nodeNum-1):
         for j in range(nodes.nodeNum):
             if (i!=j):
-                lhs.addTerms(nodes.demands[j], x[i,j])
+                lhs.addTerms(nodes.demand[j], x[i,j])
     model.addConstr(lhs <= nodes.capacity, name= 'capacity_limited' )
 
     model.setParam("OutputFlag", 0)
@@ -89,11 +88,18 @@ def get_route(x):
             break
     return route
 
+def demand_count(nodes,route):
+    demand_val=0
+    for i in route:
+        demand_val += nodes.demand[i]
+    return demand_val
+
 
 if __name__=='__main__':
-    spprc = GetData()
-    nodes = spprc.generate_node(num=100,map_size=100,time_upper=2000,demand_limit=20,servicetime_limit=20,capacity_limit=500)
-    nodes.disMatrix = spprc.get_euclidean_distance_matrix(nodes.locations)
+    nodes = GetData()
+    # nodes.generate_node(num=50)  # generate case randomly
+    nodes.read_solomon(path='R101.txt',customerNum=50)
+    nodes.disMatrix = nodes.get_euclidean_distance_matrix(nodes.location)
     model = spprc_gp(nodes)
     x_set,x_i,x_j = [],[],[]
     if model.Status==2:
@@ -104,11 +110,15 @@ if __name__=='__main__':
                 x_i.append(n[0])
                 x_j.append(n[1])
         if x_set:
+            print(x_set)
             print('--------------------------------')
             print('obj:',-model.objVal)
             print('number of nodes:',nodes.nodeNum-2)
+            print('number of visit nodes:',len(x_set))
+            print('demand meeted:',demand_count(nodes,get_route(x_set)))
             print('route:',get_route(x_set))
-    
+        nodes.plot_route(nodes.location,get_route(x_set))
+
     else:
         print('no solution!!!')
 

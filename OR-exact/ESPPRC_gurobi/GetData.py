@@ -5,44 +5,36 @@ import matplotlib.pyplot as plt
 
 
 
-
 class GetData():
     def __init__(self):
         self.color_names()
-
-    def generate_node(self,num,map_size=100,time_upper=5000,demand_limit=20,servicetime_limit=20,capacity_limit=200):
+   
+    def generate_node(self,num,map_size=100,time_upper=5000,lenth_tw=20,demand_val=20,servicetime_val=20,capacity=200):
         """generate number of locations randomly in a block unit
             default TSP : num_vehicles=1,depot=0
         """
-        class node():
-            locations = []
-            timewindows = []
-            capacity = capacity_limit # 无要求
-            demands = []
-            servicetimes = []
-            nodeNum = []
-        nodes_set = node()
         locations = [(0,0)]  # locations = [(24, 3), (21, 4), (5, 1),...] 
-        timewindows = [0]
+        readyTime = [0]
+        dueTime = [0]
         demands = [0]
         servicetimes = [0]
         for _ in range(num):
             locations.append(tuple(np.random.randint(low=0,high=map_size,size=2))) 
-            timewindows.append(np.random.randint(low=0,high=time_upper))
-            demands.append(np.random.randint(low=0,high=demand_limit))
-            servicetimes.append(np.random.randint(low=0,high=servicetime_limit))
-        locations.append(locations[0])
-        timewindows.append(time_upper*10)  # notice: no more than bigM
-        demands.append(demands[0])   # destination 
-        servicetimes.append(servicetimes[0])
+            readyTime.append(np.random.randint(low=0,high=time_upper))
+            dur_t = readyTime[-1] + np.random.randint(low=0,high=lenth_tw)
+            dueTime.append(dur_t)
+            demands.append(np.random.randint(low=0,high=demand_val))
+            servicetimes.append(np.random.randint(low=0,high=servicetime_val))
 
-        nodes_set.locations = locations
-        nodes_set.timewindows = timewindows
-        nodes_set.demands = demands
-        nodes_set.servicetimes = servicetimes
-        nodes_set.nodeNum = len(locations)
-        
-        return nodes_set
+        self.location = locations
+        self.demand = demands
+        self.readyTime = readyTime
+        self.dueTime =  dueTime
+        self.serviceTime = servicetimes
+        self.capacity =capacity
+        self.vehicleNum = 1   # defaul is 1
+        self.add_deport()  # add deport
+        self.nodeNum = len(locations)
 
 
     def get_euclidean_distance_matrix(self,locations):
@@ -81,20 +73,24 @@ class GetData():
                 readyTime.append(float(str[5]))
                 dueTime.append(float(str[6]))
                 serviceTime.append(float(str[7]))
-        self.locations=locations
+        self.location =locations
         self.demand = demand
         self.readyTime = readyTime
         self.dueTime = dueTime
         self.serviceTime = serviceTime
         self.vehicleNum = vehicleNum
         self.capacity =capacity
+        
         self.add_deport()
+        self.nodeNum = len(self.location)
+
 
     def add_deport(self):
-        self.locations.append(self.locations[0])
+        self.location.append(self.location[0])
         self.demand.append(self.demand[0])
-        self.readyTime.append(self.readyTime[0])
-        self.dueTime.append(self.dueTime[0])
+        self.readyTime.append(0)
+        self.dueTime[0] = 0   # 
+        self.dueTime.append(1e5)
         self.serviceTime.append(self.serviceTime[0])
 
 
@@ -274,9 +270,11 @@ class GetData():
 
 if __name__ == "__main__":
     ## generate data randomly
-    spprc = GetData()
-    nodes = spprc.generate_node(num=10)
-    nodes.dismatrix = spprc.get_euclidean_distance_matrix(nodes.locations)
-    spprc.plot_nodes(nodes.locations)
+    path = r'R101.txt'
+    data = GetData()
+    data.generate_node(num=100)
+    # data.read_solomon(path,customerNum=100)
+    data.disMatrix = data.get_euclidean_distance_matrix(data.location)
+    data.plot_nodes(data.location)
 
 
