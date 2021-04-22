@@ -1,17 +1,17 @@
 '''
-Description: ESPPRC with gurobi
+Description: ESPPRC solved by gurobi
 Version: 1.0
 Author: 71
 Date: 2021-04-01 11:48:47
 '''
-
 import numpy as np
 from gurobipy import *
 from GetData import *
 
 
 def spprc_gp(nodes):
-    BigM = 1e10
+    
+    BigM = 1e8
     model = Model('SPPRC')
     #定义决策变量
     x = {}
@@ -52,7 +52,7 @@ def spprc_gp(nodes):
 
     # s.t 3
     lhs = LinExpr(0)
-    for i in range(1,nodes.nodeNum-1):
+    for i in range(0,nodes.nodeNum-1):
         lhs.addTerms(1, x[i,nodes.nodeNum-1])
     model.addConstr(lhs == 1, name= 'arrive_' + str(i))
 
@@ -60,7 +60,7 @@ def spprc_gp(nodes):
     for i in range(nodes.nodeNum):
         for j in range(nodes.nodeNum):
             if (i != j):
-                model.addConstr(nodes.dueTime[i] + nodes.disMatrix[i][j] - nodes.dueTime[j] <= BigM*(1-x[i,j]), name = 'time_window_' + str(i) + str(j))
+                model.addConstr(nodes.dueTime[i] + nodes.disMatrix[i][j] - nodes.dueTime[j] <= BigM*(1-x[i,j]), name = 'time_window' + str(i) + str(j))
 
     # s.t 5
     lhs = LinExpr(0)
@@ -75,6 +75,13 @@ def spprc_gp(nodes):
 
     return model
 
+
+def demand_meet(custums,nodes):
+    demand_meet_value = 0
+    for i in custums:
+        demand_meet_value += nodes.demand[i]
+    return demand_meet_value
+
 def get_route(x):
     route = [0]
     while(1):
@@ -88,37 +95,30 @@ def get_route(x):
             break
     return route
 
-def demand_count(nodes,route):
-    demand_val=0
-    for i in route:
-        demand_val += nodes.demand[i]
-    return demand_val
-
 
 if __name__=='__main__':
-    nodes = GetData()
-    # nodes.generate_node(num=50)  # generate case randomly
-    nodes.read_solomon(path='R101.txt',customerNum=50)
-    nodes.disMatrix = nodes.get_euclidean_distance_matrix(nodes.location)
+    nodes = Data()
+    nodes.read_solomon(path=r'r101.txt',customerNum=10)
+    nodes.get_euclidean_distance_matrix()
     model = spprc_gp(nodes)
     x_set,x_i,x_j = [],[],[]
     if model.Status==2:
-        for item in model.getVars(): 
-            n = list(map(int, re.findall("\d+",item.varname))) 
+        for item in model.getVars():  # self.model.getVars()[i]. 
+            n = list(map(int, re.findall("\d+",item.varname))) # transfer to int
             if item.x == 1:
                 x_set.append(item.varname)
                 x_i.append(n[0])
                 x_j.append(n[1])
         if x_set:
-            print(x_set)
             print('--------------------------------')
             print('obj:',-model.objVal)
             print('number of nodes:',nodes.nodeNum-2)
-            print('number of visit nodes:',len(x_set))
-            print('demand meeted:',demand_count(nodes,get_route(x_set)))
+            print('number of meet nodes:',len(x_set)-1)
+            print('capacity:',nodes.capacity)
+            print('demand meet:',demand_meet(x_j,nodes))
+            print('x:',x_set)
             print('route:',get_route(x_set))
-        nodes.plot_route(nodes.location,get_route(x_set))
-
+            nodes.plot_route(locations=nodes.location,route=get_route(x_set),edgecolor='k')
     else:
         print('no solution!!!')
 

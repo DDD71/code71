@@ -2,47 +2,57 @@ import math,re
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
+from numpy import random
 
+np.random.seed(2021)
 
-
-class GetData():
+class Data():
     def __init__(self):
         self.color_names()
-   
-    def generate_node(self,num,map_size=100,time_upper=5000,lenth_tw=20,demand_val=20,servicetime_val=20,capacity=200):
+        self.location = []
+        self.capacity = 200 # 无要求
+        self.demand = []
+        self.servicetime = []
+        self.nodeNum = []
+
+    def generate_node(self,num,map_size=100,time_upper=5000,demand_limit=20,servicetime_limit=20,capacity=200):
         """generate number of locations randomly in a block unit
             default TSP : num_vehicles=1,depot=0
         """
         locations = [(0,0)]  # locations = [(24, 3), (21, 4), (5, 1),...] 
-        readyTime = [0]
-        dueTime = [0]
         demands = [0]
         servicetimes = [0]
+        readyTime = [0]
+        dueTime = [0]
         for _ in range(num):
-            locations.append(tuple(np.random.randint(low=0,high=map_size,size=2))) 
-            readyTime.append(np.random.randint(low=0,high=time_upper))
-            dur_t = readyTime[-1] + np.random.randint(low=0,high=lenth_tw)
-            dueTime.append(dur_t)
-            demands.append(np.random.randint(low=0,high=demand_val))
-            servicetimes.append(np.random.randint(low=0,high=servicetime_val))
-
+            locations.append(tuple(np.random.randint(low=0,high=map_size,size=2)))
+            t_ = np.random.randint(low=0,high=time_upper) 
+            readyTime.append(t_)  
+            dueTime.append(t_ + 10)  # timewindows size = 10
+            demands.append(np.random.randint(low=0,high=demand_limit))
+            servicetimes.append(np.random.randint(low=0,high=servicetime_limit))
+        #  add the destination 
+        locations.append(locations[0])
+        readyTime.append(0)
+        dueTime.append(time_upper*10)  # notice: no more than bigM
+        demands.append(0)  
+        servicetimes.append(0)
+        
         self.location = locations
-        self.demand = demands
         self.readyTime = readyTime
-        self.dueTime =  dueTime
-        self.serviceTime = servicetimes
-        self.capacity =capacity
-        self.vehicleNum = 1   # defaul is 1
-        self.add_deport()  # add deport
+        self.dueTime = dueTime
+        self.demand = demands
+        self.servicetime = servicetimes
         self.nodeNum = len(locations)
+        self.capacity = capacity
+        
 
-
-    def get_euclidean_distance_matrix(self,locations):
+    def get_euclidean_distance_matrix(self):
         """Creates callback to return distance between locations."""
         distances = {}
-        for from_counter, from_node in enumerate(locations):
+        for from_counter, from_node in enumerate(self.location):
             distances[from_counter] = {}
-            for to_counter, to_node in enumerate(locations):
+            for to_counter, to_node in enumerate(self.location):
                 if from_counter == to_counter:
                     distances[from_counter][to_counter] = 0
                 else:
@@ -50,7 +60,7 @@ class GetData():
                     distances[from_counter][to_counter] = (                        
                     math.hypot((from_node[0] - to_node[0]),
                                 (from_node[1] - to_node[1])))
-        return distances
+        self.disMatrix = distances
 
 
     def read_solomon(self,path,customerNum=100):
@@ -73,24 +83,22 @@ class GetData():
                 readyTime.append(float(str[5]))
                 dueTime.append(float(str[6]))
                 serviceTime.append(float(str[7]))
-        self.location =locations
+        self.location = locations
         self.demand = demand
+        readyTime[0],dueTime[0] = 0,0
         self.readyTime = readyTime
         self.dueTime = dueTime
         self.serviceTime = serviceTime
         self.vehicleNum = vehicleNum
         self.capacity =capacity
-        
         self.add_deport()
-        self.nodeNum = len(self.location)
-
+        self.nodeNum = len(locations)
 
     def add_deport(self):
         self.location.append(self.location[0])
         self.demand.append(self.demand[0])
-        self.readyTime.append(0)
-        self.dueTime[0] = 0   # 
-        self.dueTime.append(1e5)
+        self.readyTime.append(self.readyTime[0])
+        self.dueTime.append(1000)
         self.serviceTime.append(self.serviceTime[0])
 
 
@@ -270,11 +278,10 @@ class GetData():
 
 if __name__ == "__main__":
     ## generate data randomly
-    path = r'R101.txt'
-    data = GetData()
-    data.generate_node(num=100)
-    # data.read_solomon(path,customerNum=100)
-    data.disMatrix = data.get_euclidean_distance_matrix(data.location)
-    data.plot_nodes(data.location)
+    nodes = Data()
+    # nodes.generate_node(num=10)
+    nodes.read_solomon(path=r'r101.txt',customerNum=30)
+    nodes.get_euclidean_distance_matrix()
+    nodes.plot_nodes(nodes.location)
 
 
