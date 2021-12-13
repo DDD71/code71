@@ -3,7 +3,7 @@
 This is an example for how to send a file by using socket with python
 
 # Install
-pip install socket
+        pip install socket
 
 # Usage
 server : port = 8888 (by default) 
