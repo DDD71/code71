@@ -1,4 +1,4 @@
-# scripts python implement 
+# scripts
 
 This repository is some scripts implemented by pyhton
 
