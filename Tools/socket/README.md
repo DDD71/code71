@@ -1,6 +1,6 @@
 # socket
 
-This is an example for how to send a file by using socket with python
+This is an example for sending a file by using socket with python
 
 # Install
         pip install socket
